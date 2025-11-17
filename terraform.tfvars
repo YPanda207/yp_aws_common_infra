@@ -1,0 +1,4 @@
+namespace      = "yp"
+aws_region     = "us-east-1"
+tag_id         = "e7b8c2a2-4f3b-4e2a-9c7d-8a1e2f6b7c3d"
+yp_environment = "dev"
