@@ -59,7 +59,10 @@ resource "aws_s3_bucket_versioning" "versioning" {
 ## This role allows Lambda to do things inside AWS.
 resource "aws_iam_role" "lambda_role" {
   name = "${var.namespace}-lambda-exec-role"
-  assume_role_policy = jsondecode({
+  # aws_iam_role.assume_role_policy expects a JSON string. Use jsonencode to
+  # convert the HCL object into a JSON string (jsondecode expects a string
+  # input and would error with an object).
+  assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
@@ -82,7 +85,9 @@ resource "aws_iam_role_policy_attachment" "cwlogs_policy" {
 # Creates the policy to Read & Write in S3 and Dynamodb
 resource "aws_iam_policy" "policy" {
   name = "${var.namespace}-lambda-policy"
-  policy = jsondecode({
+  # aws_iam_policy.policy expects a JSON string for the policy document.
+  # Use jsonencode to encode the HCL object as JSON.
+  policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       # ---------- S3 READ & WRITE ----------
@@ -109,7 +114,7 @@ resource "aws_iam_policy" "policy" {
           "dynamodb:BatchWriteItem",
           "dynamodb:BatchGetItem"
         ]
-        Resource = "arn:aws:dynamodb:${var.aws_region}:${data.aws_caller_identity.current.account_id}:table/${var.namespace}-*"
+        Resource = "arn:aws:dynamodb:${var.aws_region}:${var.aws_account_id}:table/${var.namespace}-*"
       },
     ]
   })
