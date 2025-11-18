@@ -109,7 +109,7 @@ resource "aws_iam_policy" "policy" {
           "dynamodb:BatchWriteItem",
           "dynamodb:BatchGetItem"
         ]
-        Resource = "arn:aws:dynamodb:${var.aws_region}:${data.aws_caller_identity.current.account_id}:table/${var.ddb_table_name}"
+        Resource = "arn:aws:dynamodb:${var.aws_region}:${data.aws_caller_identity.current.account_id}:table/${var.namespace}-*"
       },
     ]
   })
