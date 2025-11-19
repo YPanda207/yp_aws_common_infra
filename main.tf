@@ -28,7 +28,7 @@ resource "aws_vpc" "vpc" {
 
 # 2. Subnets
 # 2a. Private Subnets
-resource "aws_sunbet" "private_a" {
+resource "aws_subnet" "private_a" {
   vpc_id                  = aws_vpc.vpc.id
   cidr_block              = "10.0.1.0/24"
   availability_zone       = "${var.aws_region}a"
@@ -38,7 +38,7 @@ resource "aws_sunbet" "private_a" {
     Tier = "private"
   }
 }
-resource "aws_sunbet" "private_b" {
+resource "aws_subnet" "private_b" {
   vpc_id                  = aws_vpc.vpc.id
   cidr_block              = "10.0.2.0/24"
   availability_zone       = "${var.aws_region}b"
@@ -50,7 +50,7 @@ resource "aws_sunbet" "private_b" {
 }
 
 # 2b. Public Subnets
-resource "aws_sunbet" "public_a" {
+resource "aws_subnet" "public_a" {
   vpc_id                  = aws_vpc.vpc.id
   cidr_block              = "10.0.10.0/24"
   availability_zone       = "${var.aws_region}a"
