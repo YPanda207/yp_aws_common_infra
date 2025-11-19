@@ -1,8 +1,13 @@
 /*
 1. VPC
-2. Route53 Zone (Manages DNS domains and records in AWS Route 53)
-3. S3
-4. Lambda Role
+2. Subnets
+  2a. Private Subnets
+  2b. Public Subnets
+3. Security Group
+  3a. Lambda Security Group
+4. Route53 Zone (Manages DNS domains and records in AWS Route 53)
+5. S3
+6. Lambda Role
 */
 # 1. Setup VPC
 resource "aws_vpc" "vpc" {
@@ -21,7 +26,57 @@ resource "aws_vpc" "vpc" {
   enable_dns_hostnames = true      # Assigns DNS hostnames to EC2 instances launched in the VPC. This is required if you want your instances to have public DNS names (e.g., ec2-xx-xx-xx-xx.compute-1.amazonaws.com)
 }
 
-# 2. Route53 Zone
+# 2. Subnets
+# 2a. Private Subnets
+resource "aws_subnet" "private_a" {
+  vpc_id                  = aws_vpc.vpc.id
+  cidr_block              = "10.0.1.0/24"
+  availability_zone       = "${var.aws_region}a"
+  map_public_ip_on_launch = false
+  tags = {
+    Name = "private-a"
+    Tier = "private"
+  }
+}
+resource "aws_subnet" "private_b" {
+  vpc_id                  = aws_vpc.vpc.id
+  cidr_block              = "10.0.2.0/24"
+  availability_zone       = "${var.aws_region}b"
+  map_public_ip_on_launch = false
+  tags = {
+    Name = "private-b"
+    Tier = "private"
+  }
+}
+
+# 2b. Public Subnets
+resource "aws_subnet" "public_a" {
+  vpc_id                  = aws_vpc.vpc.id
+  cidr_block              = "10.0.10.0/24"
+  availability_zone       = "${var.aws_region}a"
+  map_public_ip_on_launch = true
+  tags = {
+    Name = "public-a"
+    Tier = "public"
+  }
+}
+
+# 3. Security Group
+# 3a. Lambda Security Group
+resource "aws_security_group" "lambda_sec_grp" {
+  name   = "${var.namespace}-lambda-sec-grp-${var.yp_environment}"
+  vpc_id = aws_vpc.vpc.id
+
+  # Allow all outbound means allow lambda to talk to: NAT, AWS APIs, VPC endpoints, RDS, etc.
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+# 4. Route53 Zone
 resource "aws_route53_zone" "public_zone" {
   name          = "yp-external.world.com"
   force_destroy = false
@@ -35,7 +90,7 @@ resource "aws_route53_zone" "private_zone" {
   }
 }
 
-# 3. S3 bucket, access rule & versioning
+# 5. S3 bucket, access rule & versioning
 resource "aws_s3_bucket" "s3_bucket" {
   bucket = "${var.namespace}-world-${var.yp_environment}-${var.aws_region}"
 }
@@ -55,7 +110,7 @@ resource "aws_s3_bucket_versioning" "versioning" {
   }
 }
 
-# 4. Lambda Roles and Policies
+# 6. Lambda Roles and Policies
 ## This role allows Lambda to do things inside AWS.
 resource "aws_iam_role" "lambda_role" {
   name = "${var.namespace}-lambda-exec-role"
