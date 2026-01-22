@@ -139,7 +139,7 @@ resource "aws_iam_role_policy_attachment" "cwlogs_policy" {
 
 # Creates the policy to Read & Write in S3 and Dynamodb
 resource "aws_iam_policy" "policy" {
-  name = "${var.namespace}-lambda-policy"
+  name = "${var.namespace}-s3-dynamodb-policy"
   # aws_iam_policy.policy expects a JSON string for the policy document.
   # Use jsonencode to encode the HCL object as JSON.
   policy = jsonencode({
