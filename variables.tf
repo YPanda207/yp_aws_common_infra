@@ -1,5 +1,15 @@
-variable "namespace" {}
-variable "aws_region" {}
-variable "aws_account_id" {}
-variable "tag_id" {}
-variable "yp_environment" {}
+variable "namespace" {
+  type = string
+}
+variable "aws_region" {
+  type = string
+}
+variable "aws_account_id" {
+  type = string
+}
+variable "tag_id" {
+  type = string
+}
+variable "yp_environment" {
+  type = string
+}
